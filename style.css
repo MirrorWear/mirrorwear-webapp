@@ -1,3 +1,4 @@
+/* Общие стили */
 body {
     background: #111;
     color: #ffd700;
@@ -6,14 +7,17 @@ body {
     padding: 0;
     min-height: 100vh;
 }
+
 header {
     text-align: center;
     padding: 32px 10px 10px 10px;
 }
+
 .logo {
     width: 80px;
     margin-bottom: 8px;
 }
+
 h1 {
     font-size: 2.5em;
     margin: 0;
@@ -21,12 +25,15 @@ h1 {
     color: #ffd700;
     font-family: 'Playfair Display', 'PT Serif', serif;
 }
+
 .slogan {
     color: #ffd700;
     font-size: 1.1em;
     margin-top: 10px;
     margin-bottom: 16px;
 }
+
+/* Навигация категорий */
 nav#categories {
     display: flex;
     justify-content: center;
@@ -34,6 +41,8 @@ nav#categories {
     margin: 28px 0 22px 0;
     flex-wrap: wrap;
 }
+
+/* Все кнопки навигации */
 nav#categories button {
     background: #222;
     color: #ffd700;
@@ -45,11 +54,22 @@ nav#categories button {
     margin-bottom: 6px;
     transition: background .18s, color .18s;
 }
+
+/* Кнопка «← Назад» — всегда первый ребёнок nav#categories */
+nav#categories button:first-child {
+    background: #ffd700;
+    color: #111;
+    border-color: #ffd700;
+}
+
+/* Активная или при наведении */
 nav#categories button.active,
 nav#categories button:hover {
     background: #ffd700;
     color: #111;
 }
+
+/* Сетка товаров */
 #products {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
@@ -58,6 +78,8 @@ nav#categories button:hover {
     max-width: 1200px;
     margin: 0 auto;
 }
+
+/* Карточка товара */
 .product-card {
     background: #181818;
     border-radius: 18px;
@@ -70,22 +92,27 @@ nav#categories button:hover {
     align-items: center;
     position: relative;
 }
+
+/* Галерея в карточке */
 .product-gallery {
     width: 100%;
     max-width: 220px;
     margin-bottom: 12px;
     position: relative;
 }
+
 .product-gallery img {
     width: 100%;
     border-radius: 12px;
     object-fit: cover;
 }
+
 .product-gallery .gallery-nav {
     display: flex;
     justify-content: space-between;
     margin-top: 4px;
 }
+
 .product-gallery button {
     background: #ffd700;
     border: none;
@@ -95,27 +122,34 @@ nav#categories button:hover {
     cursor: pointer;
     font-weight: bold;
 }
+
+/* Информация в карточке */
 .product-card h2 {
     margin: 0 0 6px 0;
     font-size: 1.2em;
     font-family: 'Playfair Display', 'PT Serif', serif;
 }
+
 .product-card .sku {
     color: #bfa000;
     font-size: 0.9em;
     margin-bottom: 5px;
 }
+
 .product-card .desc {
     color: #ffec96;
     font-size: 1em;
     margin-bottom: 9px;
 }
+
 .product-card .price {
     color: #ffd700;
     font-size: 1.1em;
     margin-bottom: 10px;
     font-weight: bold;
 }
+
+/* Кнопка «В корзину» */
 .product-card button.add-to-cart {
     background: #ffd700;
     color: #111;
@@ -127,9 +161,12 @@ nav#categories button:hover {
     font-weight: bold;
     transition: background .18s, color .18s;
 }
+
 .product-card button.add-to-cart:hover {
     background: #fff6b8;
 }
+
+/* Панель корзины */
 #cart-panel {
     position: fixed;
     right: 16px;
@@ -144,19 +181,23 @@ nav#categories button:hover {
     display: none;
     z-index: 50;
 }
+
 #cart-panel.active {
     display: block;
 }
+
 #cart-items {
     max-height: 180px;
     overflow-y: auto;
     margin-bottom: 10px;
 }
+
 #cart-summary {
     border-top: 1px solid #ffd7004d;
     padding-top: 8px;
     margin-bottom: 10px;
 }
+
 #cart-panel button {
     background: #ffd700;
     color: #111;
@@ -169,9 +210,12 @@ nav#categories button:hover {
     cursor: pointer;
     font-weight: bold;
 }
+
 #cart-panel button:hover {
     background: #fff6b8;
 }
+
+/* Модальное окно (не используется по умолчанию) */
 #modal {
     position: fixed;
     top: 0; left: 0; right: 0; bottom: 0;
@@ -181,7 +225,11 @@ nav#categories button:hover {
     justify-content: center;
     z-index: 90;
 }
-#modal.hidden { display: none; }
+
+#modal.hidden {
+    display: none;
+}
+
 #modal .modal-content {
     background: #191100;
     color: #ffd700;
@@ -192,15 +240,28 @@ nav#categories button:hover {
     text-align: center;
     font-size: 1.1em;
 }
+
+/* Футер */
 footer {
     text-align: center;
     padding: 16px 0 12px 0;
     color: #bfa000;
     font-size: 0.9em;
 }
+
+/* Адаптив для мобильных */
 @media (max-width: 800px) {
-    #products { grid-template-columns: 1fr; }
-    #cart-panel { min-width: 85vw; right: 5vw; }
-    .product-card { padding: 10px; }
-    header { padding: 24px 2vw 10px 2vw; }
+    #products {
+        grid-template-columns: 1fr;
+    }
+    #cart-panel {
+        min-width: 85vw;
+        right: 5vw;
+    }
+    .product-card {
+        padding: 10px;
+    }
+    header {
+        padding: 24px 2vw 10px 2vw;
+    }
 }
