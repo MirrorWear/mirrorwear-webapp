@@ -36,15 +36,18 @@ function renderCategoryButtons() {
   if (!currentCategory) {
     // Топ‑уровень: три кнопки
     CATEGORIES.forEach(cat => {
-      const btn = document.createElement('button');
-      btn.textContent = cat.name;
-      btn.onclick = () => {
-        currentCategory = cat.name;
-        if (cat.sub.length) renderCategoryButtons(); // покажет «← Назад» + подкатегории
-        else renderProducts();
-      };
-      nav.appendChild(btn);
-    });
+  const btn = document.createElement('button');
+  btn.textContent = cat.name;
+  // вот здесь навешиваем класс active, если currentCategory совпадает
+  btn.classList.toggle('active', currentCategory === cat.name);
+  btn.onclick = () => {
+    currentCategory = cat.name;
+    currentSubcategory = null;          // сброс подкатегории
+    if (cat.sub.length) renderSubcategoryButtons(cat);
+    else renderProducts();
+  };
+  nav.appendChild(btn);
+});
 
   } else {
     // Внутри выбранной категории: кнопка «← Назад»
@@ -57,15 +60,17 @@ nav.appendChild(back);
     // Кнопки подкатегорий (если есть)
     const cat = CATEGORIES.find(c => c.name === currentCategory);
     if (cat.sub.length) {
-      cat.sub.forEach(sub => {
-        const btn = document.createElement('button');
-        btn.textContent = sub;
-        btn.onclick = () => {
-          currentSubcategory = sub;
-          renderProducts();
-        };
-        nav.appendChild(btn);
-      });
+     cat.sub.forEach(sub => {
+  const btn = document.createElement('button');
+  btn.textContent = sub;
+  // и здесь тоже навешиваем active
+  btn.classList.toggle('active', currentSubcategory === sub);
+  btn.onclick = () => {
+    currentSubcategory = sub;
+    renderProducts();
+  };
+  nav.appendChild(btn);
+});
     } else {
       // Нет подкатегорий — сразу товары
       renderProducts();
