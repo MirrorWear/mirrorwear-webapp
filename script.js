@@ -7,11 +7,10 @@ document.addEventListener('DOMContentLoaded', () => {
   let cart = [];
 
   const CATEGORIES = [
-    { name: 'Мужское',   gender: 'male',   sub: ['Рюкзаки', 'Сумки'] }, 
+    { name: 'Мужское',   gender: 'male',   sub: ['Рюкзаки', 'Сумки'] },
     { name: 'Женское',   gender: 'female', sub: ['Рюкзаки', 'Сумки'] },
     { name: 'Аксессуары',gender: 'unisex', sub: [] }
   ];
-  console.log('🛒 script.js загружен, категории:', CATEGORIES);
 
   // 1) Загрузка каталога
   async function fetchCatalog() {
@@ -47,7 +46,6 @@ document.addEventListener('DOMContentLoaded', () => {
         };
         nav.appendChild(btn);
       });
-
     } else {
       const back = document.createElement('button');
       back.textContent = '← Назад';
@@ -94,7 +92,7 @@ document.addEventListener('DOMContentLoaded', () => {
     filtered.forEach(item => main.appendChild(productCard(item)));
   }
 
-  // 5) Карточка товара
+  // 5) Создание карточки товара
   function productCard(item) {
     const card = document.createElement('div');
     card.className = 'product-card';
@@ -147,23 +145,23 @@ document.addEventListener('DOMContentLoaded', () => {
     return card;
   }
 
-  // 6) Добавление в корзину
+  // 6) Добавление в корзину (только апдейт контента)
   function addToCart(item) {
-    console.log('🛒 Добавляем в корзину:', item);
+    console.log('🛒 Добавляем:', item);
     const found = cart.find(ci => ci.sku === item.sku);
     if (found) found.qty++;
     else cart.push({ ...item, qty: 1 });
-    showCart();
+    showCart(); // обновляем панель, но не меняем её видимость
   }
 
-  // 7) Рендер панели корзины
+  // 7) Обновление содержимого панели корзины (без открытия/закрытия)
   function showCart() {
-    const panel = document.getElementById('cart-panel');
-    const items = document.getElementById('cart-items');
+    const items   = document.getElementById('cart-items');
     const summary = document.getElementById('cart-summary');
 
     if (cart.length === 0) {
-      panel.classList.remove('active');
+      items.innerHTML = '';
+      summary.innerHTML = '';
       return;
     }
 
@@ -190,10 +188,8 @@ document.addEventListener('DOMContentLoaded', () => {
       };
     });
 
-    const total = cart.reduce((sum, x) => sum + x.price * x.qty, 0);
+    const total = cart.reduce((sum, x) => sum + x.qty * x.price, 0);
     summary.innerHTML = `<b>Итого:</b> ${total} ₽`;
-
-    panel.classList.add('active');
   }
 
   // 8) Кнопка «Оформление заказа»
@@ -203,8 +199,8 @@ document.addEventListener('DOMContentLoaded', () => {
     e.stopPropagation();
     if (cart.length === 0) return;
     let text = '🛒 Новый заказ%0A';
-    cart.forEach(i => text += `${i.name} (${i.sku}) — ${i.qty}×${i.price}₽%0A`);
-    text += `Итого: ${cart.reduce((s, x) => s + x.price * x.qty, 0)}₽%0A`;
+    cart.forEach(i => { text += `${i.name} (${i.sku}) — ${i.qty}×${i.price}₽%0A`; });
+    text += `Итого: ${cart.reduce((s, x) => s + x.qty * x.price, 0)}₽%0A`;
     window.open('https://t.me/MirrorWearSupport?text=' + encodeURIComponent(text), '_blank');
   };
 
@@ -215,7 +211,7 @@ document.addEventListener('DOMContentLoaded', () => {
     showCart();
   };
 
-  // 10) Плавающая кнопка «🛒»
+  // 10) Плавающая кнопка 🛒 — только toggle панели
   const openCartBtn = document.createElement('button');
   openCartBtn.id = 'open-cart-btn';
   openCartBtn.className = 'open-cart-btn';
@@ -223,7 +219,8 @@ document.addEventListener('DOMContentLoaded', () => {
   openCartBtn.title = 'Открыть корзину';
   openCartBtn.onclick = e => {
     e.stopPropagation();
-    showCart();
+    showCart(); 
+    document.getElementById('cart-panel').classList.toggle('active');
   };
   document.body.appendChild(openCartBtn);
 
@@ -235,6 +232,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // старт!
+  // старт
   fetchCatalog();
 });
