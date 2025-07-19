@@ -81,26 +81,36 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // — Рендер карточек товаров —
-  function renderProducts() {
-    const main = document.getElementById('products');
-    main.innerHTML = '';
+ function renderProducts() {
+  const main = document.getElementById('products');
+  main.innerHTML = '';
 
-    const catObj = CATEGORIES.find(c => c.name === currentCategory);
-    if (!catObj) return;
+  // Ищем текущую категорию
+  const catObj = CATEGORIES.find(c => c.name === currentCategory);
+  if (!catObj) return;
 
-    const filtered = catalog.filter(item => {
-      if (catObj.gender !== 'unisex' && item.gender !== catObj.gender) {
-        return false;
-      }
-      return !currentSubcategory || item.category === currentSubcategory;
-    });
-
-    if (!filtered.length) {
-      main.innerHTML = '<p style="color:#bfa000; text-align:center; margin-top:32px;">Нет товаров в этой категории.</p>';
-      return;
+  // Фильтруем строго по gender и (при выборе) по подкатегории
+  const filtered = catalog.filter(item => {
+    // 1) проверяем пол
+    if (item.gender !== catObj.gender) {
+      return false;
     }
-    filtered.forEach(item => main.appendChild(productCard(item)));
+    // 2) если выбрана подкатегория — проверяем её
+    return !currentSubcategory || item.category === currentSubcategory;
+  });
+
+  if (!filtered.length) {
+    main.innerHTML = 
+      '<p style="color:#bfa000; text-align:center; margin-top:32px;">' +
+      'Нет товаров в этой категории.' +
+      '</p>';
+    return;
   }
+
+  // Рисуем карточки отфильтрованных товаров
+  filtered.forEach(item => main.appendChild(productCard(item)));
+}
+
 
   // — Карточка товара —
   function productCard(item) {
