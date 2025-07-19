@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const CATEGORIES = [
     { name: 'Мужское', sub: ['Рюкзаки', 'Сумки', 'Обувь'] },
-    { name: 'Женское одежда', sub: ['Рюкзаки', 'Сумки', 'Обувь'] },
+    { name: 'Женское', sub: ['Рюкзаки', 'Сумки', 'Обувь'] },
     { name: 'Аксессуары',     sub: [] }
   ];
 
