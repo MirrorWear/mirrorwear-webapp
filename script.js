@@ -1,26 +1,25 @@
-// Путь к JSON‑файлу с каталогом
-const CATALOG_URL = 'catalog.json';
+const CATALOG_URL = 'catalog.json';  // путь к вашему каталогу
 
 let catalog = [];
 let currentCategory = null;
 let currentSubcategory = null;
 let cart = [];
 
-// Три топ‑категории и их подкатегории
+// Топ‑категории и их подкатегории
 const CATEGORIES = [
   { name: 'Мужская одежда', sub: ['Рюкзаки', 'Сумки', 'Обувь'] },
   { name: 'Женская одежда', sub: ['Рюкзаки', 'Сумки', 'Обувь'] },
   { name: 'Аксессуары',     sub: [] }
 ];
 
-// 1) Загрузка каталога
+// Загружаем JSON и стартуем
 async function fetchCatalog() {
   const res = await fetch(CATALOG_URL);
   catalog = await res.json();
   showCategories();
 }
 
-// 2) Показать главные категории
+// Переходим на уровень выбора топ‑категорий
 function showCategories() {
   currentCategory = null;
   currentSubcategory = null;
@@ -28,57 +27,53 @@ function showCategories() {
   renderCategoryButtons();
 }
 
-// 3) Отрисовка кнопок категорий или подкатегорий + «← Назад»
+// Рисуем кнопки: либо топ‑категории, либо «← Назад» + подкатегории
 function renderCategoryButtons() {
   const nav = document.getElementById('categories');
   nav.innerHTML = '';
 
   if (!currentCategory) {
-    // Топ‑уровень: три кнопки
+    // ----- ТОП УРОВЕНЬ -----
     CATEGORIES.forEach(cat => {
-  const btn = document.createElement('button');
-  btn.textContent = cat.name;
-  // вот здесь навешиваем класс active, если currentCategory совпадает
-  btn.classList.toggle('active', currentCategory === cat.name);
-  btn.onclick = () => {
-    currentCategory = cat.name;
-    currentSubcategory = null;          // сброс подкатегории
-    if (cat.sub.length) renderSubcategoryButtons(cat);
-    else renderProducts();
-  };
-  nav.appendChild(btn);
-});
+      const btn = document.createElement('button');
+      btn.textContent = cat.name;
+      btn.classList.toggle('active', currentCategory === cat.name);
+      btn.onclick = () => {
+        currentCategory = cat.name;
+        currentSubcategory = null;
+        if (cat.sub.length) renderSubcategoryButtons(cat);
+        else renderProducts();
+      };
+      nav.appendChild(btn);
+    });
 
   } else {
-    // Внутри выбранной категории: кнопка «← Назад»
+    // ----- ВНУТРИ ВЫБРАННОЙ КАТЕГОРИИ -----
+    // кнопка «← Назад»
     const back = document.createElement('button');
-back.textContent = '← Назад';
-back.classList.add('back');       // вот этот класс!
-back.onclick = showCategories;
-nav.appendChild(back);
+    back.textContent = '← Назад';
+    back.onclick = showCategories;
+    nav.appendChild(back);
 
-    // Кнопки подкатегорий (если есть)
+    // подкатегории
     const cat = CATEGORIES.find(c => c.name === currentCategory);
-    if (cat.sub.length) {
-     cat.sub.forEach(sub => {
-  const btn = document.createElement('button');
-  btn.textContent = sub;
-  // и здесь тоже навешиваем active
-  btn.classList.toggle('active', currentSubcategory === sub);
-  btn.onclick = () => {
-    currentSubcategory = sub;
-    renderProducts();
-  };
-  nav.appendChild(btn);
-});
-    } else {
-      // Нет подкатегорий — сразу товары
-      renderProducts();
-    }
+    cat.sub.forEach(sub => {
+      const btn = document.createElement('button');
+      btn.textContent = sub;
+      btn.classList.toggle('active', currentSubcategory === sub);
+      btn.onclick = () => {
+        currentSubcategory = sub;
+        renderProducts();
+      };
+      nav.appendChild(btn);
+    });
+
+    // если нет подкатегорий — сразу показываем товары
+    if (!cat.sub.length) renderProducts();
   }
 }
 
-// 4) Показать товары по фильтру
+// Фильтруем и рисуем товары
 function renderProducts() {
   const main = document.getElementById('products');
   main.innerHTML = '';
@@ -100,15 +95,18 @@ function renderProducts() {
     main.innerHTML = '<p style="color:#bfa000; text-align:center; margin-top:32px;">Нет товаров в этой категории.</p>';
     return;
   }
-  filtered.forEach(item => main.appendChild(productCard(item)));
+
+  filtered.forEach(item => {
+    main.appendChild(productCard(item));
+  });
 }
 
-// 5) Карточка товара с галереей и кнопкой «В корзину»
+// Генерация карточки товара
 function productCard(item) {
   const card = document.createElement('div');
   card.className = 'product-card';
 
-  // Галерея
+  // — Галерея —
   const gallery = document.createElement('div');
   gallery.className = 'product-gallery';
   const img = document.createElement('img');
@@ -135,7 +133,7 @@ function productCard(item) {
   }
   card.appendChild(gallery);
 
-  // Информация
+  // — Инфо —
   const h2 = document.createElement('h2');
   h2.textContent = item.name;
   card.appendChild(h2);
@@ -155,7 +153,7 @@ function productCard(item) {
   price.textContent = item.price ? `${item.price} ₽` : '';
   card.appendChild(price);
 
-  // Кнопка «В корзину»
+  // — Кнопка «В корзину» —
   const btn = document.createElement('button');
   btn.className = 'add-to-cart';
   btn.textContent = 'В корзину';
@@ -165,7 +163,7 @@ function productCard(item) {
   return card;
 }
 
-// 6) Добавление в корзину
+// Добавляем товар в массив cart и обновляем панель
 function addToCart(item) {
   const found = cart.find(ci => ci.sku === item.sku);
   if (found) found.qty++;
@@ -173,16 +171,18 @@ function addToCart(item) {
   showCart();
 }
 
-// 7) Показ/скрытие панели корзины
+// Отрисовка / скрытие панели корзины
 function showCart() {
   const panel   = document.getElementById('cart-panel');
   const items   = document.getElementById('cart-items');
   const summary = document.getElementById('cart-summary');
+
   if (!cart.length) {
     panel.classList.remove('active');
     return;
   }
   panel.classList.add('active');
+
   items.innerHTML = '';
   cart.forEach(i => {
     const line = document.createElement('div');
@@ -193,43 +193,47 @@ function showCart() {
     `;
     items.appendChild(line);
   });
-  // Обработка +/−
+
+  // управление “+” и “–”
   items.querySelectorAll('button').forEach(b => {
     const sku = b.dataset.sku;
     b.onclick = () => {
       const it = cart.find(x => x.sku === sku);
-      if (b.classList.contains('plus')) it.qty++;
-      else it.qty--;
+      b.classList.contains('plus') ? it.qty++ : it.qty--;
       cart = cart.filter(x => x.qty > 0);
       showCart();
     };
   });
-  const total = cart.reduce((s,x) => s + x.price * x.qty, 0);
+
+  const total = cart.reduce((s, x) => s + x.price * x.qty, 0);
   summary.innerHTML = `<b>Итого:</b> ${total} ₽`;
 }
 
-// 8) Оформление заказа — открытие чата
+// Оформление заказа
 document.getElementById('checkout-btn').onclick = () => {
   if (!cart.length) return;
   let text = '🛒 Новый заказ%0A';
   cart.forEach(i => {
     text += `${i.name} (${i.sku}) — ${i.qty}×${i.price}₽%0A`;
   });
-  text += `Итого: ${cart.reduce((s,x) => s + x.price*x.qty,0)}₽%0A`;
-  // Ваш никнейм в Telegram без @
+  const total = cart.reduce((s, x) => s + x.qty * x.price, 0);
+  text += `Итого: ${total}₽%0A`;
+  // здесь меняем на ваш username или username службы поддержки
   window.open('https://t.me/MirrorWearSupport?text=' + text, '_blank');
 };
 
-// 9) Очистка корзины
+// Очистить корзину
 document.getElementById('clear-cart-btn').onclick = () => {
   cart = [];
   showCart();
 };
 
-// 10) Закрыть панель при клике вне её
+// Закрытие панели при клике вне её
 window.onclick = e => {
   const p = document.getElementById('cart-panel');
-  if (p.classList.contains('active') && !p.contains(e.target) && e.target.id !== 'checkout-btn') {
+  if (p.classList.contains('active')
+      && !p.contains(e.target)
+      && e.target.id !== 'checkout-btn') {
     p.classList.remove('active');
   }
 };
