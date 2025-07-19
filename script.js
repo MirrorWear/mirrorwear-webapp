@@ -9,21 +9,21 @@ document.addEventListener('DOMContentLoaded', () => {
   let currentSubcategory = null;
   let cart = [];
 
-  // Настройте здесь имена и пол (gender) для каждой категории
+  // Ваши категории
   const CATEGORIES = [
     { name: 'Мужское',   gender: 'male',   sub: ['Рюкзаки', 'Сумки', 'Обувь'] },
     { name: 'Женское',   gender: 'female', sub: ['Рюкзаки', 'Сумки', 'Обувь'] },
     { name: 'Аксессуары',gender: 'unisex', sub: [] }
   ];
 
-  // 1) Загрузка каталога
+  // — Загрузка каталога —
   async function fetchCatalog() {
     const res = await fetch(CATALOG_URL);
     catalog = await res.json();
     showCategories();
   }
 
-  // 2) Показать топ‑категории
+  // — Показать категории —
   function showCategories() {
     currentCategory = null;
     currentSubcategory = null;
@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
     renderCategoryButtons();
   }
 
-  // 3) Рисуем кнопки категорий или подкатегорий + «← Назад»
+  // — Рендер категорий / подкатегорий + «← Назад» —
   function renderCategoryButtons() {
     const nav = document.getElementById('categories');
     nav.innerHTML = '';
@@ -46,7 +46,6 @@ document.addEventListener('DOMContentLoaded', () => {
           currentCategory = cat.name;
           currentSubcategory = null;
           renderCategoryButtons();
-          // если нет подкатегорий
           if (!cat.sub.length) renderProducts();
         };
         nav.appendChild(btn);
@@ -59,9 +58,9 @@ document.addEventListener('DOMContentLoaded', () => {
       back.onclick = showCategories;
       nav.appendChild(back);
 
-      // ПОДКАТЕГОРИИ (скрываем «Обувь»)
+      // Подкатегории (скрываем «Обувь»)
       const catObj = CATEGORIES.find(c => c.name === currentCategory);
-      const visibleSubs = catObj.sub.filter(sub => sub !== 'Обувь');
+      const visibleSubs = catObj.sub.filter(s => s !== 'Обувь');
 
       visibleSubs.forEach(sub => {
         const btn = document.createElement('button');
@@ -75,42 +74,34 @@ document.addEventListener('DOMContentLoaded', () => {
         nav.appendChild(btn);
       });
 
-      // если после фильтрации нет подкатегорий
+      // Если после фильтрации нет подкатегорий — сразу товары
       if (!visibleSubs.length) renderProducts();
     }
   }
 
-  // 4) Фильтрация и показ карточек
+  // — Рендер карточек товаров —
   function renderProducts() {
     const main = document.getElementById('products');
     main.innerHTML = '';
 
-    // найдём объект текущей категории
     const catObj = CATEGORIES.find(c => c.name === currentCategory);
     if (!catObj) return;
 
-    // фильтруем по gender и (если есть) по подкатегории
     const filtered = catalog.filter(item => {
-      // сначала пол
       if (catObj.gender !== 'unisex' && item.gender !== catObj.gender) {
         return false;
       }
-      // потом подкатегория
-      if (currentSubcategory) {
-        return item.category === currentSubcategory;
-      }
-      return true;
+      return !currentSubcategory || item.category === currentSubcategory;
     });
 
     if (!filtered.length) {
       main.innerHTML = '<p style="color:#bfa000; text-align:center; margin-top:32px;">Нет товаров в этой категории.</p>';
       return;
     }
-
     filtered.forEach(item => main.appendChild(productCard(item)));
   }
 
-  // 5) Карточка товара
+  // — Карточка товара —
   function productCard(item) {
     const card = document.createElement('div');
     card.className = 'product-card';
@@ -142,7 +133,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     card.appendChild(gallery);
 
-    // Инфо
+    // Информация
     const h2 = document.createElement('h2');
     h2.textContent = item.name;
     card.appendChild(h2);
@@ -172,7 +163,7 @@ document.addEventListener('DOMContentLoaded', () => {
     return card;
   }
 
-  // 6) Корзина
+  // — Добавить в корзину —
   function addToCart(item) {
     const found = cart.find(ci => ci.sku === item.sku);
     if (found) found.qty++;
@@ -180,6 +171,7 @@ document.addEventListener('DOMContentLoaded', () => {
     showCart();
   }
 
+  // — Показ / скрытие панели корзины —
   function showCart() {
     const panel   = document.getElementById('cart-panel');
     const items   = document.getElementById('cart-items');
@@ -212,28 +204,42 @@ document.addEventListener('DOMContentLoaded', () => {
     summary.innerHTML = `<b>Итого:</b> ${total} ₽`;
   }
 
-  // 7) Оформление заказа
-  document.getElementById('checkout-btn').onclick = () => {
+  // Устанавливаем нужный текст для кнопки оформления
+const checkoutBtn = document.getElementById('checkout-btn');
+if (checkoutBtn) checkoutBtn.textContent = 'Оформление заказа';
+
+  // — Добавить плавающую кнопку «🛒» для открытия корзины —
+  const openCartBtn = document.createElement('button');
+  openCartBtn.id = 'open-cart-btn';
+  openCartBtn.className = 'open-cart-btn';
+  openCartBtn.textContent = '🛒';
+  openCartBtn.title = 'Открыть корзину';
+  openCartBtn.onclick = () => {
+    document.getElementById('cart-panel').classList.toggle('active');
+  };
+  document.body.appendChild(openCartBtn);
+
+  // — Оформление заказа —
+  document.getElementById('checkout-btn').addEventListener('click', () => {
     if (!cart.length) return;
     let text = '🛒 Новый заказ%0A';
     cart.forEach(i => {
       text += `${i.name} (${i.sku}) — ${i.qty}×${i.price}₽%0A`;
     });
-    const total = cart.reduce((s, x) => s + x.qty * x.price, 0);
-    text += `Итого: ${total}₽%0A`;
+    text += `Итого: ${cart.reduce((s, x) => s + x.price * x.qty, 0)}₽%0A`;
     window.open(
       'https://t.me/MirrorWearSupport?text=' + encodeURIComponent(text),
       '_blank'
     );
-  };
+  });
 
-  // 8) Очистка корзины
-  document.getElementById('clear-cart-btn').onclick = () => {
+  // — Очистка корзины —
+  document.getElementById('clear-cart-btn').addEventListener('click', () => {
     cart = [];
     showCart();
-  };
+  });
 
-  // 9) Закрытие панели корзины по клику вне неё
+  // — Закрытие панели по клику вне неё —
   window.addEventListener('click', e => {
     const p = document.getElementById('cart-panel');
     if (
@@ -245,6 +251,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Запуск
+  // Стартуем
   fetchCatalog();
 });
