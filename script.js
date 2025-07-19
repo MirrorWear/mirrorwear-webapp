@@ -9,20 +9,21 @@ document.addEventListener('DOMContentLoaded', () => {
   let currentSubcategory = null;
   let cart = [];
 
+  // Настройте здесь имена и пол (gender) для каждой категории
   const CATEGORIES = [
-    { name: 'Мужское', sub: ['Рюкзаки', 'Сумки', 'Обувь'] },
-    { name: 'Женское', sub: ['Рюкзаки', 'Сумки', 'Обувь'] },
-    { name: 'Аксессуары',     sub: [] }
+    { name: 'Мужское',   gender: 'male',   sub: ['Рюкзаки', 'Сумки', 'Обувь'] },
+    { name: 'Женское',   gender: 'female', sub: ['Рюкзаки', 'Сумки', 'Обувь'] },
+    { name: 'Аксессуары',gender: 'unisex', sub: [] }
   ];
 
-  // Загрузить JSON‑каталог и стартовать
+  // 1) Загрузка каталога
   async function fetchCatalog() {
     const res = await fetch(CATALOG_URL);
     catalog = await res.json();
     showCategories();
   }
 
-  // Показать только три топ‑категории
+  // 2) Показать топ‑категории
   function showCategories() {
     currentCategory = null;
     currentSubcategory = null;
@@ -30,13 +31,13 @@ document.addEventListener('DOMContentLoaded', () => {
     renderCategoryButtons();
   }
 
-  // Нарисовать кнопки (либо топ‑уровня, либо «← Назад» + подкатегорий)
+  // 3) Рисуем кнопки категорий или подкатегорий + «← Назад»
   function renderCategoryButtons() {
     const nav = document.getElementById('categories');
     nav.innerHTML = '';
 
     if (!currentCategory) {
-      // ТОП‑УРОВЕНЬ
+      // ТОП‑КАТЕГОРИИ
       CATEGORIES.forEach(cat => {
         const btn = document.createElement('button');
         btn.textContent = cat.name;
@@ -45,21 +46,22 @@ document.addEventListener('DOMContentLoaded', () => {
           currentCategory = cat.name;
           currentSubcategory = null;
           renderCategoryButtons();
+          // если нет подкатегорий
           if (!cat.sub.length) renderProducts();
         };
         nav.appendChild(btn);
       });
 
     } else {
-      // Кнопка «← Назад»
+      // ← Назад
       const back = document.createElement('button');
       back.textContent = '← Назад';
       back.onclick = showCategories;
       nav.appendChild(back);
 
-      // Подкатегории, но скрываем "Обувь"
-      const cat = CATEGORIES.find(c => c.name === currentCategory);
-      const visibleSubs = cat.sub.filter(sub => sub !== 'Обувь');
+      // ПОДКАТЕГОРИИ (скрываем «Обувь»)
+      const catObj = CATEGORIES.find(c => c.name === currentCategory);
+      const visibleSubs = catObj.sub.filter(sub => sub !== 'Обувь');
 
       visibleSubs.forEach(sub => {
         const btn = document.createElement('button');
@@ -73,34 +75,42 @@ document.addEventListener('DOMContentLoaded', () => {
         nav.appendChild(btn);
       });
 
-      // Если после фильтрации нет подкатегорий — сразу показываем товары
+      // если после фильтрации нет подкатегорий
       if (!visibleSubs.length) renderProducts();
     }
   }
 
-  // Отфильтровать и показать карточки товаров
+  // 4) Фильтрация и показ карточек
   function renderProducts() {
     const main = document.getElementById('products');
     main.innerHTML = '';
 
+    // найдём объект текущей категории
+    const catObj = CATEGORIES.find(c => c.name === currentCategory);
+    if (!catObj) return;
+
+    // фильтруем по gender и (если есть) по подкатегории
     const filtered = catalog.filter(item => {
-      if (currentCategory === 'Мужская одежда' && item.gender === 'male')
-        return !currentSubcategory || item.category === currentSubcategory;
-      if (currentCategory === 'Женская одежда' && item.gender === 'female')
-        return !currentSubcategory || item.category === currentSubcategory;
-      if (currentCategory === 'Аксессуары' && item.gender === 'unisex')
-        return true;
-      return false;
+      // сначала пол
+      if (catObj.gender !== 'unisex' && item.gender !== catObj.gender) {
+        return false;
+      }
+      // потом подкатегория
+      if (currentSubcategory) {
+        return item.category === currentSubcategory;
+      }
+      return true;
     });
 
     if (!filtered.length) {
       main.innerHTML = '<p style="color:#bfa000; text-align:center; margin-top:32px;">Нет товаров в этой категории.</p>';
       return;
     }
+
     filtered.forEach(item => main.appendChild(productCard(item)));
   }
 
-  // Вернуть DOM‑узел карточки товара
+  // 5) Карточка товара
   function productCard(item) {
     const card = document.createElement('div');
     card.className = 'product-card';
@@ -132,7 +142,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     card.appendChild(gallery);
 
-    // Информация
+    // Инфо
     const h2 = document.createElement('h2');
     h2.textContent = item.name;
     card.appendChild(h2);
@@ -152,7 +162,7 @@ document.addEventListener('DOMContentLoaded', () => {
     price.textContent = item.price ? `${item.price} ₽` : '';
     card.appendChild(price);
 
-    // Кнопка «В корзину»
+    // В корзину
     const btn = document.createElement('button');
     btn.className = 'add-to-cart';
     btn.textContent = 'В корзину';
@@ -162,7 +172,7 @@ document.addEventListener('DOMContentLoaded', () => {
     return card;
   }
 
-  // Корзина
+  // 6) Корзина
   function addToCart(item) {
     const found = cart.find(ci => ci.sku === item.sku);
     if (found) found.qty++;
@@ -202,6 +212,7 @@ document.addEventListener('DOMContentLoaded', () => {
     summary.innerHTML = `<b>Итого:</b> ${total} ₽`;
   }
 
+  // 7) Оформление заказа
   document.getElementById('checkout-btn').onclick = () => {
     if (!cart.length) return;
     let text = '🛒 Новый заказ%0A';
@@ -216,11 +227,13 @@ document.addEventListener('DOMContentLoaded', () => {
     );
   };
 
+  // 8) Очистка корзины
   document.getElementById('clear-cart-btn').onclick = () => {
     cart = [];
     showCart();
   };
 
+  // 9) Закрытие панели корзины по клику вне неё
   window.addEventListener('click', e => {
     const p = document.getElementById('cart-panel');
     if (
