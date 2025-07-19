@@ -11,10 +11,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Ваши категории
   const CATEGORIES = [
-    { name: 'Мужское',   gender: 'male',   sub: ['Рюкзаки', 'Сумки', 'Обувь'] },
-    { name: 'Женское',   gender: 'female', sub: ['Рюкзаки', 'Сумки', 'Обувь'] },
-    { name: 'Аксессуары',gender: 'unisex', sub: [] }
-  ];
+  { name: 'Мужское',   gender: 'male',   sub: ['Рюкзаки', 'Сумки', 'Обувь'] },
+  { name: 'Женское',   gender: 'female', sub: ['Рюкзаки', 'Сумки', 'Обувь'] },
+  { name: 'Аксессуары',gender: 'unisex', sub: [] }
+];
+
 
   // — Загрузка каталога —
   async function fetchCatalog() {
