@@ -49,9 +49,10 @@ function renderCategoryButtons() {
   } else {
     // Внутри выбранной категории: кнопка «← Назад»
     const back = document.createElement('button');
-    back.textContent = '← Назад';
-    back.onclick = showCategories;
-    nav.appendChild(back);
+back.textContent = '← Назад';
+back.classList.add('back');       // вот этот класс!
+back.onclick = showCategories;
+nav.appendChild(back);
 
     // Кнопки подкатегорий (если есть)
     const cat = CATEGORIES.find(c => c.name === currentCategory);
