@@ -35,7 +35,6 @@ h1 {
     margin-bottom: 16px;
 }
 
-
 /* =========================================================================
    Навигация категорий
    ========================================================================= */
@@ -43,7 +42,7 @@ nav#categories {
     display: flex;
     justify-content: center;
     gap: 18px;
-    margin: 28px 0 22px 0;
+    margin: 28px 0 22px;
     flex-wrap: wrap;
 }
 
@@ -60,23 +59,12 @@ nav#categories button {
     transition: background .18s, color .18s;
 }
 
-/* Кнопка «← Назад» в обычном состоянии */
-nav#categories button.back {
-    /* наследует фон и бордер от общих кнопок */
-}
-
-/* При наведении на любую кнопку (включая «← Назад») */
-nav#categories button:hover {
-    background: #ffd700;
-    color: #111;
-}
-
-/* Активная (выбранная) категория или подкатегория */
+/* При наведении или когда кнопка отмечена как active */
+nav#categories button:hover,
 nav#categories button.active {
     background: #ffd700;
     color: #111;
 }
-
 
 /* =========================================================================
    Сетка товаров
@@ -85,11 +73,10 @@ nav#categories button.active {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
     gap: 28px;
-    padding: 0 14px 24px 14px;
+    padding: 0 14px 24px;
     max-width: 1200px;
     margin: 0 auto;
 }
-
 
 /* =========================================================================
    Карточка товара
@@ -107,7 +94,6 @@ nav#categories button.active {
     position: relative;
 }
 
-/* Галерея в карточке */
 .product-gallery {
     width: 100%;
     max-width: 220px;
@@ -137,9 +123,8 @@ nav#categories button.active {
     font-weight: bold;
 }
 
-/* Информация в карточке */
 .product-card h2 {
-    margin: 0 0 6px 0;
+    margin: 0 0 6px;
     font-size: 1.2em;
     font-family: 'Playfair Display', 'PT Serif', serif;
 }
@@ -163,7 +148,6 @@ nav#categories button.active {
     font-weight: bold;
 }
 
-/* Кнопка «В корзину» */
 .product-card button.add-to-cart {
     background: #ffd700;
     color: #111;
@@ -180,7 +164,6 @@ nav#categories button.active {
     background: #fff6b8;
 }
 
-
 /* =========================================================================
    Панель корзины
    ========================================================================= */
@@ -192,11 +175,11 @@ nav#categories button.active {
     border: 2px solid #ffd700;
     border-radius: 22px;
     color: #ffd700;
-    padding: 22px 18px 14px 18px;
+    padding: 22px 18px 14px;
     box-shadow: 0 0 30px #000a;
     min-width: 300px;
     display: none;
-    z-index: 50;
+    z-index: 90;
 }
 
 #cart-panel.active {
@@ -232,7 +215,6 @@ nav#categories button.active {
     background: #fff6b8;
 }
 
-
 /* =========================================================================
    Модальное окно (по умолчанию скрыто)
    ========================================================================= */
@@ -243,7 +225,7 @@ nav#categories button.active {
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 90;
+    z-index: 95;
 }
 
 #modal.hidden {
@@ -261,17 +243,15 @@ nav#categories button.active {
     font-size: 1.1em;
 }
 
-
 /* =========================================================================
    Футер
    ========================================================================= */
 footer {
     text-align: center;
-    padding: 16px 0 12px 0;
+    padding: 16px 0 12px;
     color: #bfa000;
     font-size: 0.9em;
 }
-
 
 /* =========================================================================
    Адаптив для мобильных
@@ -288,29 +268,29 @@ footer {
         padding: 10px;
     }
     header {
-        padding: 24px 2vw 10px 2vw;
+        padding: 24px 2vw 10px;
     }
 }
+
 /* =========================================================================
    Плавающая кнопка «🛒»
    ========================================================================= */
- .open-cart-btn {
--    left: 16px;
-+    right: 16px;
-     bottom: 16px;
-     background: #ffd700;
-     color: #111;
-     border: none;
-     border-radius: 50%;
-     width: 54px;
-     height: 54px;
-     font-size: 1.5em;
-     cursor: pointer;
-     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
--    z-index: 60;
-+    z-index: 100; /* побольше, чтобы наверняка перекрывать всё */
-     transition: background .18s, transform .1s;
- }
+.open-cart-btn {
+    position: fixed;
+    right: 16px;
+    bottom: 16px;
+    background: #ffd700;
+    color: #111;
+    border: none;
+    border-radius: 50%;
+    width: 54px;
+    height: 54px;
+    font-size: 1.5em;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+    z-index: 100;
+    transition: background .18s, transform .1s;
+}
 
 .open-cart-btn:hover {
     background: #fff6b8;
