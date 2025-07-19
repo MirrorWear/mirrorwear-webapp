@@ -207,16 +207,19 @@ document.addEventListener('DOMContentLoaded', () => {
     summary.innerHTML = `<b>Итого:</b> ${total} ₽`;
   }
 
-  // Плавающая кнопка «🛒» для открытия/скрытия корзины
+   // — Плавающая кнопка «🛒» для открытия/скрытия корзины —
   const openCartBtn = document.createElement('button');
   openCartBtn.id = 'open-cart-btn';
   openCartBtn.className = 'open-cart-btn';
   openCartBtn.textContent = '🛒';
   openCartBtn.title = 'Открыть корзину';
+  // вот здесь добавляем log и toggle
   openCartBtn.onclick = () => {
+    console.log('🛒 Открываем/скрываем корзину, сейчас в ней:', cart);
     document.getElementById('cart-panel').classList.toggle('active');
   };
   document.body.appendChild(openCartBtn);
+
 
   // Кнопка «Оформление заказа»
   const checkoutBtn = document.getElementById('checkout-btn');
