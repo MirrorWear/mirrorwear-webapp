@@ -10,8 +10,8 @@ document.addEventListener('DOMContentLoaded', () => {
   let cart = [];
 
   const CATEGORIES = [
-    { name: 'Мужская одежда', sub: ['Рюкзаки', 'Сумки', 'Обувь'] },
-    { name: 'Женская одежда', sub: ['Рюкзаки', 'Сумки', 'Обувь'] },
+    { name: 'Мужское', sub: ['Рюкзаки', 'Сумки', 'Обувь'] },
+    { name: 'Женское одежда', sub: ['Рюкзаки', 'Сумки', 'Обувь'] },
     { name: 'Аксессуары',     sub: [] }
   ];
 
@@ -36,7 +36,7 @@ document.addEventListener('DOMContentLoaded', () => {
     nav.innerHTML = '';
 
     if (!currentCategory) {
-      // топ‑категории
+      // ТОП‑УРОВЕНЬ
       CATEGORIES.forEach(cat => {
         const btn = document.createElement('button');
         btn.textContent = cat.name;
@@ -51,15 +51,17 @@ document.addEventListener('DOMContentLoaded', () => {
       });
 
     } else {
-      // кнопка «← Назад»
+      // Кнопка «← Назад»
       const back = document.createElement('button');
       back.textContent = '← Назад';
       back.onclick = showCategories;
       nav.appendChild(back);
 
-      // подкатегории
+      // Подкатегории, но скрываем "Обувь"
       const cat = CATEGORIES.find(c => c.name === currentCategory);
-      cat.sub.forEach(sub => {
+      const visibleSubs = cat.sub.filter(sub => sub !== 'Обувь');
+
+      visibleSubs.forEach(sub => {
         const btn = document.createElement('button');
         btn.textContent = sub;
         btn.classList.toggle('active', currentSubcategory === sub);
@@ -71,8 +73,8 @@ document.addEventListener('DOMContentLoaded', () => {
         nav.appendChild(btn);
       });
 
-      // если у этой категории **нет** подкатегорий, сразу показываем товары
-      if (!cat.sub.length) renderProducts();
+      // Если после фильтрации нет подкатегорий — сразу показываем товары
+      if (!visibleSubs.length) renderProducts();
     }
   }
 
@@ -103,7 +105,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const card = document.createElement('div');
     card.className = 'product-card';
 
-    // галерея
+    // Галерея
     const gallery = document.createElement('div');
     gallery.className = 'product-gallery';
     const img = document.createElement('img');
@@ -130,7 +132,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     card.appendChild(gallery);
 
-    // информация
+    // Информация
     const h2 = document.createElement('h2');
     h2.textContent = item.name;
     card.appendChild(h2);
@@ -150,7 +152,7 @@ document.addEventListener('DOMContentLoaded', () => {
     price.textContent = item.price ? `${item.price} ₽` : '';
     card.appendChild(price);
 
-    // кнопка «В корзину»
+    // Кнопка «В корзину»
     const btn = document.createElement('button');
     btn.className = 'add-to-cart';
     btn.textContent = 'В корзину';
@@ -160,7 +162,7 @@ document.addEventListener('DOMContentLoaded', () => {
     return card;
   }
 
-  // корзина
+  // Корзина
   function addToCart(item) {
     const found = cart.find(ci => ci.sku === item.sku);
     if (found) found.qty++;
