@@ -1,0 +1,53 @@
+[
+  {
+    "id": "MWBAG001",
+    "sku": "BAG-101",
+    "name": "Мужская сумка MirrorWear",
+    "description": "Стильная мужская сумка из экокожи с золотой фурнитурой. Удобная и вместительная.",
+    "price": 10500,
+    "gender": "male",
+    "category": "Сумки",
+    "images": [
+      "https://img.freepik.com/free-photo/black-leather-bag-isolated_1203-7498.jpg",
+      "https://img.freepik.com/free-photo/leather-bag-details_1203-7533.jpg"
+    ]
+  },
+  {
+    "id": "MWBK001",
+    "sku": "BK-201",
+    "name": "Женский рюкзак MirrorWear",
+    "description": "Компактный женский рюкзак из премиум-материалов. Подходит к любому образу.",
+    "price": 8900,
+    "gender": "female",
+    "category": "Рюкзаки",
+    "images": [
+      "https://img.freepik.com/free-photo/black-leather-backpack-isolated_1203-7637.jpg",
+      "https://img.freepik.com/free-photo/stylish-black-leather-backpack_1203-7627.jpg"
+    ]
+  },
+  {
+    "id": "MWSHOE01",
+    "sku": "SH-301",
+    "name": "Мужские кроссовки MirrorWear",
+    "description": "Современные кроссовки для города. Лёгкие, стильные и долговечные.",
+    "price": 11500,
+    "gender": "male",
+    "category": "Обувь",
+    "images": [
+      "https://img.freepik.com/free-photo/black-leather-sneakers_1203-8422.jpg",
+      "https://img.freepik.com/free-photo/pair-of-modern-black-shoes_1203-8301.jpg"
+    ]
+  },
+  {
+    "id": "MWGLASS01",
+    "sku": "ACC-501",
+    "name": "Очки MirrorWear Classic",
+    "description": "Аксессуар для стиля и защиты. Унисекс. В комплекте чехол.",
+    "price": 4800,
+    "gender": "unisex",
+    "category": "Аксессуары",
+    "images": [
+      "https://img.freepik.com/free-photo/stylish-black-sunglasses_1203-7929.jpg"
+    ]
+  }
+]
