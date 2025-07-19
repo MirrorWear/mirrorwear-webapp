@@ -291,3 +291,27 @@ footer {
         padding: 24px 2vw 10px 2vw;
     }
 }
+/* =========================================================================
+   Плавающая кнопка «🛒»
+   ========================================================================= */
+.open-cart-btn {
+    position: fixed;
+    left: 16px;
+    bottom: 16px;
+    background: #ffd700;
+    color: #111;
+    border: none;
+    border-radius: 50%;
+    width: 54px;
+    height: 54px;
+    font-size: 1.5em;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    z-index: 60;
+    transition: background .18s, transform .1s;
+}
+
+.open-cart-btn:hover {
+    background: #fff6b8;
+    transform: scale(1.05);
+}
