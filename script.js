@@ -7,52 +7,78 @@ document.addEventListener('DOMContentLoaded', () => {
   let cart = [];
 
   const CATEGORIES = [
-    { name: 'Мужское',   gender: 'male',   sub: ['Рюкзаки', 'Сумки'] },
-    { name: 'Женское',   gender: 'female', sub: ['Рюкзаки', 'Сумки'] },
-    { name: 'Аксессуары',gender: 'unisex', sub: [] }
+    { name: 'Мужское',    gender: 'male',   sub: ['Рюкзаки', 'Сумки'] },
+    { name: 'Женское',    gender: 'female', sub: ['Рюкзаки', 'Сумки'] },
+    { name: 'Аксессуары', gender: 'unisex', sub: [] }
   ];
 
-  // === УТИЛИТЫ ФОКУСА / ПОДСВЕТКИ ===========================================
+  // === Утилиты ==============================================================
+  function navEl() {
+    return document.getElementById('categories');
+  }
+
   function clearFocus() {
-    // снимаем фокус с активного элемента и со всех кнопок навигации
     document.activeElement?.blur?.();
-    const nav = document.getElementById('categories');
+    const nav = navEl();
     if (nav) nav.querySelectorAll('button, a, .category-btn').forEach(el => el.blur());
   }
 
-  // на случай возврата из истории (back/forward) и BFCache
-  window.addEventListener('popstate', clearFocus);
+  function ensureNoActiveOnRoot() {
+    // На корневом уровне не должно быть .active ни у одной кнопки
+    const nav = navEl();
+    if (!nav) return;
+    if (nav.dataset.level === 'root') {
+      nav.querySelectorAll('.active').forEach(el => el.classList.remove('active'));
+      // страховка на случай, если браузер вернул страницу из BFCache и навесил фокус
+      clearFocus();
+      // ещё одна микрозадержка — если стили применяются после перерисовки
+      setTimeout(() => {
+        nav.querySelectorAll('.active').forEach(el => el.classList.remove('active'));
+        clearFocus();
+      }, 0);
+    }
+  }
+
+  // При возврате по истории и BFCache снимаем фокус/подсветку
+  window.addEventListener('popstate', () => {
+    clearFocus();
+    ensureNoActiveOnRoot();
+  });
   window.addEventListener('pageshow', () => {
     clearFocus();
+    ensureNoActiveOnRoot();
   });
 
-  // === 1) Загрузка каталога ================================================
+  // === 1) Загрузка каталога =================================================
   async function fetchCatalog() {
     const res = await fetch(CATALOG_URL);
     catalog = await res.json();
     showCategories();
   }
 
-  // === 2) Показать категории (корень) ======================================
+  // === 2) Показать корневые категории ======================================
   function showCategories() {
     currentCategory = null;
     currentSubcategory = null;
     document.getElementById('products').innerHTML = '';
     renderCategoryButtons();
-    clearFocus(); // важно: после перерисовки корня снимаем фокус
+    clearFocus();
+    ensureNoActiveOnRoot();
   }
 
-  // === 3) Рендер категорий / подкатегорий ==================================
+  // === 3) Рендер категорий/подкатегорий ====================================
   function renderCategoryButtons() {
-    const nav = document.getElementById('categories');
+    const nav = navEl();
     nav.innerHTML = '';
 
-    // корневой уровень — три кнопки категорий
+    // Корень
     if (!currentCategory) {
+      nav.dataset.level = 'root';
+
       CATEGORIES.forEach(cat => {
         const btn = document.createElement('button');
         btn.textContent = cat.name;
-        // верхний уровень не подсвечиваем классом .active
+        // На корне запрещаем любые активы
         btn.classList.remove('active');
 
         btn.onclick = e => {
@@ -61,42 +87,45 @@ document.addEventListener('DOMContentLoaded', () => {
           currentSubcategory = null;
           renderCategoryButtons();
           if (cat.sub.length === 0) renderProducts();
-          // снимаем фокус, чтобы не "залипала" жёлтая подсветка от :focus
           btn.blur();
         };
+
         nav.appendChild(btn);
       });
+
+      // На всякий случай подчистим всё активное
+      ensureNoActiveOnRoot();
+      return;
     }
-    // уровень подкатегорий
-    else {
-      const back = document.createElement('button');
-      back.textContent = '← Назад';
-      back.onclick = e => { 
-        e.stopPropagation(); 
-        showCategories(); 
-        back.blur();
+
+    // Подкатегории
+    nav.dataset.level = 'sub';
+
+    const back = document.createElement('button');
+    back.textContent = '← Назад';
+    back.onclick = e => {
+      e.stopPropagation();
+      showCategories();
+      back.blur();
+    };
+    nav.appendChild(back);
+
+    const catObj = CATEGORIES.find(c => c.name === currentCategory);
+    catObj.sub.forEach(sub => {
+      const btn = document.createElement('button');
+      btn.textContent = sub;
+      btn.classList.toggle('active', currentSubcategory === sub);
+      btn.onclick = e => {
+        e.stopPropagation();
+        currentSubcategory = sub;
+        renderProducts();
+        renderCategoryButtons();
+        btn.blur();
       };
-      nav.appendChild(back);
+      nav.appendChild(btn);
+    });
 
-      const catObj = CATEGORIES.find(c => c.name === currentCategory);
-      catObj.sub.forEach(sub => {
-        const btn = document.createElement('button');
-        btn.textContent = sub;
-        // подсветка для активной подкатегории (это ок)
-        btn.classList.toggle('active', currentSubcategory === sub);
-
-        btn.onclick = e => {
-          e.stopPropagation();
-          currentSubcategory = sub;
-          renderProducts();
-          renderCategoryButtons();
-          btn.blur();
-        };
-        nav.appendChild(btn);
-      });
-
-      if (catObj.sub.length === 0) renderProducts();
-    }
+    if (catObj.sub.length === 0) renderProducts();
   }
 
   // === 4) Рендер товаров ====================================================
@@ -176,14 +205,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // === 6) Добавление в корзину =============================================
   function addToCart(item) {
-    console.log('🛒 Добавляем:', item);
     const found = cart.find(ci => ci.sku === item.sku);
     if (found) found.qty++;
     else cart.push({ ...item, qty: 1 });
-    showCart(); // обновляем панель, но не меняем её видимость
+    showCart();
   }
 
-  // === 7) Обновление содержимого панели корзины =============================
+  // === 7) Обновление панели корзины ========================================
   function showCart() {
     const items   = document.getElementById('cart-items');
     const summary = document.getElementById('cart-summary');
@@ -243,7 +271,7 @@ document.addEventListener('DOMContentLoaded', () => {
     e.currentTarget.blur?.();
   };
 
-  // === 10) Плавающая кнопка 🛒 — только toggle панели =======================
+  // === 10) Плавающая кнопка 🛒 — toggle панели =============================
   const openCartBtn = document.createElement('button');
   openCartBtn.id = 'open-cart-btn';
   openCartBtn.className = 'open-cart-btn';
@@ -263,9 +291,11 @@ document.addEventListener('DOMContentLoaded', () => {
     if (panel.classList.contains('active') && !panel.contains(e.target)) {
       panel.classList.remove('active');
       clearFocus();
+      ensureNoActiveOnRoot();
     }
   });
 
   // === Старт ================================================================
   fetchCatalog();
 });
+
