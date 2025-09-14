@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
     { name: 'Аксессуары', gender: 'unisex', sub: [] }
   ];
 
-  // === Утилиты ==============================================================
+  // === Утилиты =============================================================
   function navEl() {
     return document.getElementById('categories');
   }
@@ -24,22 +24,15 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function ensureNoActiveOnRoot() {
-    // На корневом уровне не должно быть .active ни у одной кнопки
     const nav = navEl();
     if (!nav) return;
     if (nav.dataset.level === 'root') {
       nav.querySelectorAll('.active').forEach(el => el.classList.remove('active'));
-      // страховка на случай, если браузер вернул страницу из BFCache и навесил фокус
       clearFocus();
-      // ещё одна микрозадержка — если стили применяются после перерисовки
-      setTimeout(() => {
-        nav.querySelectorAll('.active').forEach(el => el.classList.remove('active'));
-        clearFocus();
-      }, 0);
     }
   }
 
-  // При возврате по истории и BFCache снимаем фокус/подсветку
+  // Снимаем подсветку при возврате назад/вперёд
   window.addEventListener('popstate', () => {
     clearFocus();
     ensureNoActiveOnRoot();
@@ -49,7 +42,7 @@ document.addEventListener('DOMContentLoaded', () => {
     ensureNoActiveOnRoot();
   });
 
-  // === 1) Загрузка каталога =================================================
+  // === 1) Загрузка каталога ================================================
   async function fetchCatalog() {
     const res = await fetch(CATALOG_URL);
     catalog = await res.json();
@@ -78,13 +71,12 @@ document.addEventListener('DOMContentLoaded', () => {
       CATEGORIES.forEach(cat => {
         const btn = document.createElement('button');
         btn.textContent = cat.name;
-        // На корне запрещаем любые активы
         btn.classList.remove('active');
 
         btn.onclick = e => {
           e.stopPropagation();
           currentCategory = cat.name;
-          currentSubcategory = null;
+          currentSubcategory = null; // сбрасываем подкатегорию
           renderCategoryButtons();
           if (cat.sub.length === 0) renderProducts();
           btn.blur();
@@ -93,7 +85,6 @@ document.addEventListener('DOMContentLoaded', () => {
         nav.appendChild(btn);
       });
 
-      // На всякий случай подчистим всё активное
       ensureNoActiveOnRoot();
       return;
     }
@@ -114,7 +105,12 @@ document.addEventListener('DOMContentLoaded', () => {
     catObj.sub.forEach(sub => {
       const btn = document.createElement('button');
       btn.textContent = sub;
-      btn.classList.toggle('active', currentSubcategory === sub);
+
+      // подсвечиваем только если реально выбрана подкатегория
+      if (currentSubcategory && currentSubcategory === sub) {
+        btn.classList.add('active');
+      }
+
       btn.onclick = e => {
         e.stopPropagation();
         currentSubcategory = sub;
@@ -298,4 +294,6 @@ document.addEventListener('DOMContentLoaded', () => {
   // === Старт ================================================================
   fetchCatalog();
 });
+
+
 
