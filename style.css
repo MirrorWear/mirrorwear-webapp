@@ -2,297 +2,330 @@
    Общие стили
    ========================================================================= */
 body {
-    background: #111;
-    color: #ffd700;
-    font-family: 'Playfair Display', 'PT Serif', serif;
-    margin: 0;
-    padding: 0;
-    min-height: 100vh;
+  background: #111;
+  color: #ffd700;
+  font-family: 'Playfair Display', 'PT Serif', serif;
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
 }
 
 header {
-    text-align: center;
-    padding: 32px 10px 10px 10px;
+  text-align: center;
+  padding: 32px 10px 10px 10px;
 }
 
 .logo {
-    width: 80px;
-    margin-bottom: 8px;
+  width: 80px;
+  margin-bottom: 8px;
 }
 
 h1 {
-    font-size: 2.5em;
-    margin: 0;
-    letter-spacing: 0.18em;
-    color: #ffd700;
-    font-family: 'Playfair Display', 'PT Serif', serif;
+  font-size: 2.5em;
+  margin: 0;
+  letter-spacing: 0.18em;
+  color: #ffd700;
+  font-family: 'Playfair Display', 'PT Serif', serif;
 }
 
 .slogan {
-    color: #ffd700;
-    font-size: 1.1em;
-    margin-top: 10px;
-    margin-bottom: 16px;
+  color: #ffd700;
+  font-size: 1.1em;
+  margin-top: 10px;
+  margin-bottom: 16px;
 }
 
 /* =========================================================================
    Навигация категорий
    ========================================================================= */
 nav#categories {
-    display: flex;
-    justify-content: center;
-    gap: 18px;
-    margin: 28px 0 22px;
-    flex-wrap: wrap;
+  display: flex;
+  justify-content: center;
+  gap: 18px;
+  margin: 28px 0 22px;
+  flex-wrap: wrap;
 }
 
-/* Все кнопки навигации */
+/* Все кнопки навигации (базовое состояние на корне) */
 nav#categories button {
-    background: #222;
-    color: #ffd700;
-    border: 2px solid #ffd700;
-    border-radius: 18px;
-    font-size: 1em;
-    padding: 12px 22px;
-    cursor: pointer;
-    margin-bottom: 6px;
-    transition: background .18s, color .18s;
+  background: #222;
+  color: #ffd700;
+  border: 2px solid #ffd700;
+  border-radius: 18px;
+  font-size: 1em;
+  padding: 12px 22px;
+  cursor: pointer;
+  margin-bottom: 6px;
+  transition: background .18s, color .18s;
 }
 
-/* При наведении или когда кнопка отмечена как active */
-nav#categories button:hover,
-nav#categories button.active {
-    background: #ffd700;
-    color: #111;
+/* Ховер (лёгкая подсветка для всех) */
+nav#categories button:hover {
+  background: #fff6b8;
+  color: #111;
+}
+
+/* --- ВАЖНО: активная подсветка только в подкатегориях --- */
+#categories[data-level="sub"] button.active {
+  background: #ffd700;
+  color: #111;
+}
+
+/* На корне активную заливку запрещаем полностью */
+#categories[data-level="root"] button.active {
+  background: #222 !important;     /* базовый фон */
+  color: #ffd700 !important;        /* базовый текст */
+}
+
+/* Глушим залипание фокуса (desktop + mobile) */
+nav#categories button:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+/* Отключаем iOS/Android tap-подсветку */
+* { -webkit-tap-highlight-color: rgba(0,0,0,0); }
+
+/* На тач-устройствах прибиваем фокус/active на корне */
+@media (hover: none) and (pointer: coarse) {
+  #categories[data-level="root"] button:focus,
+  #categories[data-level="root"] button:active {
+    outline: none !important;
+    box-shadow: none !important;
+    background: #222 !important;
+    color: #ffd700 !important;
+  }
 }
 
 /* =========================================================================
    Сетка товаров
    ========================================================================= */
 #products {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
-    gap: 28px;
-    padding: 0 14px 24px;
-    max-width: 1200px;
-    margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+  gap: 28px;
+  padding: 0 14px 24px;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
 /* =========================================================================
    Карточка товара
    ========================================================================= */
 .product-card {
-    background: #181818;
-    border-radius: 18px;
-    box-shadow: 0 4px 18px #0008;
-    padding: 20px;
-    color: #ffd700;
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    position: relative;
+  background: #181818;
+  border-radius: 18px;
+  box-shadow: 0 4px 18px #0008;
+  padding: 20px;
+  color: #ffd700;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
 }
 
 .product-gallery {
-    width: 100%;
-    max-width: 220px;
-    margin-bottom: 12px;
-    position: relative;
+  width: 100%;
+  max-width: 220px;
+  margin-bottom: 12px;
+  position: relative;
 }
 
 .product-gallery img {
-    width: 100%;
-    border-radius: 12px;
-    object-fit: cover;
+  width: 100%;
+  border-radius: 12px;
+  object-fit: cover;
 }
 
 .product-gallery .gallery-nav {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 4px;
+  display: flex;
+  justify-content: space-between;
+  margin-top: 4px;
 }
 
 .product-gallery button {
-    background: #ffd700;
-    border: none;
-    color: #111;
-    padding: 4px 10px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: bold;
+  background: #ffd700;
+  border: none;
+  color: #111;
+  padding: 4px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
 }
 
 .product-card h2 {
-    margin: 0 0 6px;
-    font-size: 1.2em;
-    font-family: 'Playfair Display', 'PT Serif', serif;
+  margin: 0 0 6px;
+  font-size: 1.2em;
+  font-family: 'Playfair Display', 'PT Serif', serif;
 }
 
 .product-card .sku {
-    color: #bfa000;
-    font-size: 0.9em;
-    margin-bottom: 5px;
+  color: #bfa000;
+  font-size: 0.9em;
+  margin-bottom: 5px;
 }
 
 .product-card .desc {
-    color: #ffec96;
-    font-size: 1em;
-    margin-bottom: 9px;
+  color: #ffec96;
+  font-size: 1em;
+  margin-bottom: 9px;
 }
 
 .product-card .price {
-    color: #ffd700;
-    font-size: 1.1em;
-    margin-bottom: 10px;
-    font-weight: bold;
+  color: #ffd700;
+  font-size: 1.1em;
+  margin-bottom: 10px;
+  font-weight: bold;
 }
 
 .product-card button.add-to-cart {
-    background: #ffd700;
-    color: #111;
-    border: none;
-    padding: 10px 28px;
-    border-radius: 14px;
-    font-size: 1em;
-    cursor: pointer;
-    font-weight: bold;
-    transition: background .18s, color .18s;
+  background: #ffd700;
+  color: #111;
+  border: none;
+  padding: 10px 28px;
+  border-radius: 14px;
+  font-size: 1em;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background .18s, color .18s;
 }
 
 .product-card button.add-to-cart:hover {
-    background: #fff6b8;
+  background: #fff6b8;
 }
 
 /* =========================================================================
    Панель корзины
    ========================================================================= */
 #cart-panel {
-    position: fixed;
-    right: 16px;
-    bottom: 16px;
-    background: #191100;
-    border: 2px solid #ffd700;
-    border-radius: 22px;
-    color: #ffd700;
-    padding: 22px 18px 14px;
-    box-shadow: 0 0 30px #000a;
-    min-width: 300px;
-    display: none;
-    z-index: 90;
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  background: #191100;
+  border: 2px solid #ffd700;
+  border-radius: 22px;
+  color: #ffd700;
+  padding: 22px 18px 14px;
+  box-shadow: 0 0 30px #000a;
+  min-width: 300px;
+  display: none;
+  z-index: 90;
 }
 
 #cart-panel.active {
-    display: block;
+  display: block;
 }
 
 #cart-items {
-    max-height: 180px;
-    overflow-y: auto;
-    margin-bottom: 10px;
+  max-height: 180px;
+  overflow-y: auto;
+  margin-bottom: 10px;
 }
 
 #cart-summary {
-    border-top: 1px solid #ffd7004d;
-    padding-top: 8px;
-    margin-bottom: 10px;
+  border-top: 1px solid #ffd7004d;
+  padding-top: 8px;
+  margin-bottom: 10px;
 }
 
 #cart-panel button {
-    background: #ffd700;
-    color: #111;
-    border: none;
-    border-radius: 12px;
-    padding: 8px 18px;
-    font-size: 1em;
-    margin-right: 7px;
-    margin-bottom: 6px;
-    cursor: pointer;
-    font-weight: bold;
+  background: #ffd700;
+  color: #111;
+  border: none;
+  border-radius: 12px;
+  padding: 8px 18px;
+  font-size: 1em;
+  margin-right: 7px;
+  margin-bottom: 6px;
+  cursor: pointer;
+  font-weight: bold;
 }
 
 #cart-panel button:hover {
-    background: #fff6b8;
+  background: #fff6b8;
 }
 
 /* =========================================================================
-   Модальное окно (по умолчанию скрыто)
+   Модальное окно
    ========================================================================= */
 #modal {
-    position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: #111b;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 95;
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: #111b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 95;
 }
 
 #modal.hidden {
-    display: none;
+  display: none;
 }
 
 #modal .modal-content {
-    background: #191100;
-    color: #ffd700;
-    border-radius: 18px;
-    padding: 28px 26px;
-    max-width: 350px;
-    box-shadow: 0 0 18px #0009;
-    text-align: center;
-    font-size: 1.1em;
+  background: #191100;
+  color: #ffd700;
+  border-radius: 18px;
+  padding: 28px 26px;
+  max-width: 350px;
+  box-shadow: 0 0 18px #0009;
+  text-align: center;
+  font-size: 1.1em;
 }
 
 /* =========================================================================
    Футер
    ========================================================================= */
 footer {
-    text-align: center;
-    padding: 16px 0 12px;
-    color: #bfa000;
-    font-size: 0.9em;
+  text-align: center;
+  padding: 16px 0 12px;
+  color: #bfa000;
+  font-size: 0.9em;
 }
 
 /* =========================================================================
    Адаптив для мобильных
    ========================================================================= */
 @media (max-width: 800px) {
-    #products {
-        grid-template-columns: 1fr;
-    }
-    #cart-panel {
-        min-width: 85vw;
-        right: 5vw;
-    }
-    .product-card {
-        padding: 10px;
-    }
-    header {
-        padding: 24px 2vw 10px;
-    }
+  #products {
+    grid-template-columns: 1fr;
+  }
+  #cart-panel {
+    min-width: 85vw;
+    right: 5vw;
+  }
+  .product-card {
+    padding: 10px;
+  }
+  header {
+    padding: 24px 2vw 10px;
+  }
 }
 
 /* =========================================================================
    Плавающая кнопка «🛒»
    ========================================================================= */
 .open-cart-btn {
-    position: fixed;
-    right: 16px;
-    bottom: 16px;
-    background: #ffd700;
-    color: #111;
-    border: none;
-    border-radius: 50%;
-    width: 54px;
-    height: 54px;
-    font-size: 1.5em;
-    cursor: pointer;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.5);
-    z-index: 100;
-    transition: background .18s, transform .1s;
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  background: #ffd700;
+  color: #111;
+  border: none;
+  border-radius: 50%;
+  width: 54px;
+  height: 54px;
+  font-size: 1.5em;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+  z-index: 100;
+  transition: background .18s, transform .1s;
 }
 
 .open-cart-btn:hover {
-    background: #fff6b8;
-    transform: scale(1.05);
+  background: #fff6b8;
+  transform: scale(1.05);
 }
+
+
