@@ -12,56 +12,85 @@ document.addEventListener('DOMContentLoaded', () => {
     { name: 'Аксессуары',gender: 'unisex', sub: [] }
   ];
 
-  // 1) Загрузка каталога
+  // === УТИЛИТЫ ФОКУСА / ПОДСВЕТКИ ===========================================
+  function clearFocus() {
+    // снимаем фокус с активного элемента и со всех кнопок навигации
+    document.activeElement?.blur?.();
+    const nav = document.getElementById('categories');
+    if (nav) nav.querySelectorAll('button, a, .category-btn').forEach(el => el.blur());
+  }
+
+  // на случай возврата из истории (back/forward) и BFCache
+  window.addEventListener('popstate', clearFocus);
+  window.addEventListener('pageshow', () => {
+    clearFocus();
+  });
+
+  // === 1) Загрузка каталога ================================================
   async function fetchCatalog() {
     const res = await fetch(CATALOG_URL);
     catalog = await res.json();
     showCategories();
   }
 
-  // 2) Показать категории
+  // === 2) Показать категории (корень) ======================================
   function showCategories() {
     currentCategory = null;
     currentSubcategory = null;
     document.getElementById('products').innerHTML = '';
     renderCategoryButtons();
+    clearFocus(); // важно: после перерисовки корня снимаем фокус
   }
 
-  // 3) Рендер категорий / подкатегорий
+  // === 3) Рендер категорий / подкатегорий ==================================
   function renderCategoryButtons() {
     const nav = document.getElementById('categories');
     nav.innerHTML = '';
 
+    // корневой уровень — три кнопки категорий
     if (!currentCategory) {
       CATEGORIES.forEach(cat => {
         const btn = document.createElement('button');
         btn.textContent = cat.name;
-        btn.classList.toggle('active', false);
+        // верхний уровень не подсвечиваем классом .active
+        btn.classList.remove('active');
+
         btn.onclick = e => {
           e.stopPropagation();
           currentCategory = cat.name;
           currentSubcategory = null;
           renderCategoryButtons();
           if (cat.sub.length === 0) renderProducts();
+          // снимаем фокус, чтобы не "залипала" жёлтая подсветка от :focus
+          btn.blur();
         };
         nav.appendChild(btn);
       });
-    } else {
+    }
+    // уровень подкатегорий
+    else {
       const back = document.createElement('button');
       back.textContent = '← Назад';
-      back.onclick = e => { e.stopPropagation(); showCategories(); };
+      back.onclick = e => { 
+        e.stopPropagation(); 
+        showCategories(); 
+        back.blur();
+      };
       nav.appendChild(back);
 
       const catObj = CATEGORIES.find(c => c.name === currentCategory);
       catObj.sub.forEach(sub => {
         const btn = document.createElement('button');
         btn.textContent = sub;
+        // подсветка для активной подкатегории (это ок)
         btn.classList.toggle('active', currentSubcategory === sub);
+
         btn.onclick = e => {
           e.stopPropagation();
           currentSubcategory = sub;
           renderProducts();
           renderCategoryButtons();
+          btn.blur();
         };
         nav.appendChild(btn);
       });
@@ -70,7 +99,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // 4) Рендер товаров
+  // === 4) Рендер товаров ====================================================
   function renderProducts() {
     const main = document.getElementById('products');
     main.innerHTML = '';
@@ -92,7 +121,7 @@ document.addEventListener('DOMContentLoaded', () => {
     filtered.forEach(item => main.appendChild(productCard(item)));
   }
 
-  // 5) Создание карточки товара
+  // === 5) Карточка товара ===================================================
   function productCard(item) {
     const card = document.createElement('div');
     card.className = 'product-card';
@@ -139,13 +168,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const btn = document.createElement('button');
     btn.className = 'add-to-cart';
     btn.textContent = 'В корзину';
-    btn.onclick = e => { e.stopPropagation(); addToCart(item); };
+    btn.onclick = e => { e.stopPropagation(); addToCart(item); btn.blur(); };
     card.appendChild(btn);
 
     return card;
   }
 
-  // 6) Добавление в корзину (только апдейт контента)
+  // === 6) Добавление в корзину =============================================
   function addToCart(item) {
     console.log('🛒 Добавляем:', item);
     const found = cart.find(ci => ci.sku === item.sku);
@@ -154,7 +183,7 @@ document.addEventListener('DOMContentLoaded', () => {
     showCart(); // обновляем панель, но не меняем её видимость
   }
 
-  // 7) Обновление содержимого панели корзины (без открытия/закрытия)
+  // === 7) Обновление содержимого панели корзины =============================
   function showCart() {
     const items   = document.getElementById('cart-items');
     const summary = document.getElementById('cart-summary');
@@ -185,6 +214,7 @@ document.addEventListener('DOMContentLoaded', () => {
         else it.qty--;
         cart = cart.filter(x => x.qty > 0);
         showCart();
+        b.blur();
       };
     });
 
@@ -192,7 +222,7 @@ document.addEventListener('DOMContentLoaded', () => {
     summary.innerHTML = `<b>Итого:</b> ${total} ₽`;
   }
 
-  // 8) Кнопка «Оформление заказа»
+  // === 8) Кнопка «Оформление заказа» =======================================
   const checkoutBtn = document.getElementById('checkout-btn');
   checkoutBtn.textContent = 'Оформление заказа';
   checkoutBtn.onclick = e => {
@@ -202,16 +232,18 @@ document.addEventListener('DOMContentLoaded', () => {
     cart.forEach(i => { text += `${i.name} (${i.sku}) — ${i.qty}×${i.price}₽%0A`; });
     text += `Итого: ${cart.reduce((s, x) => s + x.qty * x.price, 0)}₽%0A`;
     window.open('https://t.me/MirrorWearSupport?text=' + encodeURIComponent(text), '_blank');
+    checkoutBtn.blur();
   };
 
-  // 9) Очистка корзины
+  // === 9) Очистка корзины ===================================================
   document.getElementById('clear-cart-btn').onclick = e => {
     e.stopPropagation();
     cart = [];
     showCart();
+    e.currentTarget.blur?.();
   };
 
-  // 10) Плавающая кнопка 🛒 — только toggle панели
+  // === 10) Плавающая кнопка 🛒 — только toggle панели =======================
   const openCartBtn = document.createElement('button');
   openCartBtn.id = 'open-cart-btn';
   openCartBtn.className = 'open-cart-btn';
@@ -219,19 +251,21 @@ document.addEventListener('DOMContentLoaded', () => {
   openCartBtn.title = 'Открыть корзину';
   openCartBtn.onclick = e => {
     e.stopPropagation();
-    showCart(); 
+    showCart();
     document.getElementById('cart-panel').classList.toggle('active');
+    openCartBtn.blur();
   };
   document.body.appendChild(openCartBtn);
 
-  // 11) Клик вне панели — скрыть
+  // === 11) Клик вне панели — скрыть ========================================
   window.addEventListener('click', e => {
     const panel = document.getElementById('cart-panel');
     if (panel.classList.contains('active') && !panel.contains(e.target)) {
       panel.classList.remove('active');
+      clearFocus();
     }
   });
 
-  // старт
+  // === Старт ================================================================
   fetchCatalog();
 });
