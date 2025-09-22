@@ -46,7 +46,7 @@ nav#categories {
   flex-wrap: wrap;
 }
 
-/* Все кнопки навигации (базовое состояние на корне) */
+/* Все кнопки навигации */
 nav#categories button {
   background: #222;
   color: #ffd700;
@@ -59,34 +59,27 @@ nav#categories button {
   transition: background .18s, color .18s;
 }
 
-/* Ховер (лёгкая подсветка для всех) */
-nav#categories button:hover {
-  background: #fff6b8;
-  color: #111;
+/* Ховер рисуем только на ПК с мышью */
+@media (hover: hover) and (pointer: fine) {
+  nav#categories button:hover {
+    background: #fff6b8;
+    color: #111;
+  }
 }
 
-/* --- ВАЖНО: активная подсветка только в подкатегориях --- */
+/* Активная подсветка только в подкатегориях */
 #categories[data-level="sub"] button.active {
   background: #ffd700;
   color: #111;
 }
 
-/* На корне активную заливку запрещаем полностью */
+/* На главной (root) запрещаем активную подсветку */
 #categories[data-level="root"] button.active {
-  background: #222 !important;     /* базовый фон */
-  color: #ffd700 !important;        /* базовый текст */
+  background: #222 !important;
+  color: #ffd700 !important;
 }
 
-@media (hover: hover) {
-  #categories[data-level="root"] button:hover,
-  #categories[data-level="root"] button:focus,
-  #categories[data-level="root"] button:active {
-    background: #222 !important;
-    color: #ffd700 !important;
-  }
-}
-
-/* Глушим залипание фокуса (desktop + mobile) */
+/* Глушим focus/active */
 nav#categories button:focus {
   outline: none;
   box-shadow: none;
@@ -95,7 +88,7 @@ nav#categories button:focus {
 /* Отключаем iOS/Android tap-подсветку */
 * { -webkit-tap-highlight-color: rgba(0,0,0,0); }
 
-/* На тач-устройствах прибиваем фокус/active на корне */
+/* На тач-устройствах убиваем фокус/active на корне */
 @media (hover: none) and (pointer: coarse) {
   #categories[data-level="root"] button:focus,
   #categories[data-level="root"] button:active {
@@ -336,5 +329,6 @@ footer {
   background: #fff6b8;
   transform: scale(1.05);
 }
+
 
 
