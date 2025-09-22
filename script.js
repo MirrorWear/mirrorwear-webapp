@@ -32,14 +32,39 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  function hardClearRootHighlight() {
+    const nav = navEl();
+    if (!nav || nav.dataset.level !== 'root') return;
+
+    ensureNoActiveOnRoot();
+
+    nav.querySelectorAll('button').forEach(btn => {
+      btn.style.background = '#222';
+      btn.style.color = '#ffd700';
+    });
+  }
+
   function resetNavigationToRoot() {
     showCategories();
-    ensureNoActiveOnRoot();
   }
 
   // Снимаем подсветку при возврате назад/вперёд и через BFCache
-  window.addEventListener('popstate', resetNavigationToRoot);
-  window.addEventListener('pageshow', resetNavigationToRoot);
+  window.addEventListener('popstate', () => {
+    resetNavigationToRoot();
+    hardClearRootHighlight();
+  });
+  window.addEventListener('pageshow', () => {
+    resetNavigationToRoot();
+    hardClearRootHighlight();
+  });
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') {
+      hardClearRootHighlight();
+    }
+  });
+  window.addEventListener('pagehide', () => {
+    hardClearRootHighlight();
+  });
 
   // === 1) Загрузка каталога ================================================
   async function fetchCatalog() {
@@ -54,8 +79,6 @@ document.addEventListener('DOMContentLoaded', () => {
     currentSubcategory = null;
     document.getElementById('products').innerHTML = '';
     renderCategoryButtons();
-    clearFocus();
-    ensureNoActiveOnRoot();
   }
 
   // === 3) Рендер категорий/подкатегорий ====================================
@@ -71,6 +94,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const btn = document.createElement('button');
         btn.textContent = cat.name;
         btn.classList.remove('active');
+        btn.style.background = '#222';
+        btn.style.color = '#ffd700';
 
         btn.onclick = e => {
           e.stopPropagation();
@@ -84,7 +109,7 @@ document.addEventListener('DOMContentLoaded', () => {
         nav.appendChild(btn);
       });
 
-      ensureNoActiveOnRoot();
+      hardClearRootHighlight();
       return;
     }
 
