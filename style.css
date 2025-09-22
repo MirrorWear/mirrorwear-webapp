@@ -77,6 +77,15 @@ nav#categories button:hover {
   color: #ffd700 !important;        /* базовый текст */
 }
 
+@media (hover: hover) {
+  #categories[data-level="root"] button:hover,
+  #categories[data-level="root"] button:focus,
+  #categories[data-level="root"] button:active {
+    background: #222 !important;
+    color: #ffd700 !important;
+  }
+}
+
 /* Глушим залипание фокуса (desktop + mobile) */
 nav#categories button:focus {
   outline: none;
