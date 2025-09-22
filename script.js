@@ -32,15 +32,14 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // Снимаем подсветку при возврате назад/вперёд
-  window.addEventListener('popstate', () => {
-    clearFocus();
+  function resetNavigationToRoot() {
+    showCategories();
     ensureNoActiveOnRoot();
-  });
-  window.addEventListener('pageshow', () => {
-    clearFocus();
-    ensureNoActiveOnRoot();
-  });
+  }
+
+  // Снимаем подсветку при возврате назад/вперёд и через BFCache
+  window.addEventListener('popstate', resetNavigationToRoot);
+  window.addEventListener('pageshow', resetNavigationToRoot);
 
   // === 1) Загрузка каталога ================================================
   async function fetchCatalog() {
